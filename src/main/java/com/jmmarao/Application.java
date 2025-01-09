@@ -1,6 +1,5 @@
 package com.jmmarao;
 
-import com.jmmarao.boardgame.Board;
 import com.jmmarao.chess.ChessMatch;
 
 public class Application {
