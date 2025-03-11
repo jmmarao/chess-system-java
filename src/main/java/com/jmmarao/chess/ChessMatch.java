@@ -1,6 +1,8 @@
 package com.jmmarao.chess;
 
 import com.jmmarao.boardgame.Board;
+import com.jmmarao.boardgame.Piece;
+import com.jmmarao.boardgame.Position;
 import com.jmmarao.chess.pieces.King;
 import com.jmmarao.chess.pieces.Rook;
 
@@ -20,6 +22,28 @@ public class ChessMatch {
             }
         }
         return mat;
+    }
+
+    public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+        Position source = sourcePosition.toPosition();
+        Position target = targetPosition.toPosition();
+
+        validateSourcePosition(source);
+        Piece capturedPiece = makeMove(source, target);
+
+        return (ChessPiece) capturedPiece;
+    }
+
+    private Piece makeMove(Position source, Position target) {
+        Piece piece = board.removePiece(source);
+        Piece capturedPiece = board.removePiece(target);
+        board.placePiece(piece, target);
+        return capturedPiece;
+    }
+
+    private void validateSourcePosition(Position position) {
+        if (!board.thereIsAPiece(position))
+            throw new ChessException("There is no piece on source position");
     }
 
     private void initialSetup() {
