@@ -2,12 +2,17 @@ package com.jmmarao.chess.pieces;
 
 import com.jmmarao.boardgame.Board;
 import com.jmmarao.boardgame.Position;
+import com.jmmarao.chess.ChessMatch;
 import com.jmmarao.chess.ChessPiece;
 import com.jmmarao.chess.Color;
 
 public class King extends ChessPiece {
-    public King(Board board, Color color) {
+
+    private ChessMatch chessMatch;
+
+    public King(Board board, Color color, ChessMatch chessMatch) {
         super(board, color);
+        this.chessMatch = chessMatch;
     }
 
     @Override
@@ -56,12 +61,43 @@ public class King extends ChessPiece {
         if (getBoard().positionExists(p) && canMove(p))
             mat[p.getRow()][p.getColumn()] = true;
 
+        // special move castling
+        if (getMoveCount() == 0 && !chessMatch.isCheck()) {
+            // special move castling king side rook
+            Position positionT1 = new Position(position.getRow(), position.getColumn() + 3);
+
+            if (testRookCastling(positionT1)) {
+                Position position1 = new Position(position.getRow(), position.getColumn() + 1);
+                Position position2 = new Position(position.getRow(), position.getColumn() + 2);
+
+                if (getBoard().piece(position1) == null && getBoard().piece(position2) == null)
+                    mat[position.getRow()][position.getColumn() + 2] = true;
+            }
+
+            // special move castling queen side rook
+            Position positionT2 = new Position(position.getRow(), position.getColumn() - 4);
+
+            if (testRookCastling(positionT2)) {
+                Position position1 = new Position(position.getRow(), position.getColumn() - 1);
+                Position position2 = new Position(position.getRow(), position.getColumn() - 2);
+                Position position3 = new Position(position.getRow(), position.getColumn() - 3);
+
+                if (getBoard().piece(position1) == null && getBoard().piece(position2) == null && getBoard().piece(position3) == null)
+                    mat[position.getRow()][position.getColumn() - 2] = true;
+            }
+        }
+
         return mat;
     }
 
     private boolean canMove(Position position) {
         ChessPiece p = (ChessPiece) getBoard().piece(position);
         return p == null || p.getColor() != getColor();
+    }
+
+    private boolean testRookCastling(Position position) {
+        ChessPiece piece = (ChessPiece) getBoard().piece(position);
+        return piece instanceof Rook && piece.getColor() == getColor() && piece.getMoveCount() == 0;
     }
 
     @Override
